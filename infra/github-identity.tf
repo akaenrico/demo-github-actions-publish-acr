@@ -10,7 +10,7 @@ resource "azurerm_federated_identity_credential" "github_main" {
 
   issuer   = "https://token.actions.githubusercontent.com"
   audience = ["api://AzureADTokenExchange"]
-  subject  = "repo:akaenrico/demo-github-actions-publish-acr:ref:refs/heads/main"
+  subject  = "repo:akaenrico@39354620/demo-github-actions-publish-acr@1369049105:ref:refs/heads/main"
 }
 
 resource "azurerm_role_assignment" "github_acr_push" {
