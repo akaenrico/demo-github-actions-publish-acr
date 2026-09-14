@@ -10,3 +10,5 @@ The Action runs on every push made in any branches. It is composed by two differ
 | `publish`  | Checkout code, build and test image, login to Azure and finally push the image to ACR                                                 |
 
 I'm using Terraform mainly to create the Resource Group and the Container Registry (easier to remove all the created resources later on with `tf destroy`)
+
+Hire me pls, much love
