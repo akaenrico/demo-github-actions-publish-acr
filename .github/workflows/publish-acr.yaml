@@ -1,0 +1,73 @@
+name: Publish to Azure Container Registry
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.27.1"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Validate Go code
+        working-directory: ./
+        run: go vet ./...
+
+  publish:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      ACR_NAME: ${{ vars.ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+      IMAGE_NAME: hello-gopher
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build image
+        run: |
+          docker build \
+            --tag "$ACR_LOGIN_SERVER/$IMAGE_NAME:$GITHUB_SHA" \
+            .
+
+      - name: Test image
+        run: |
+          output=$(docker run --rm "$ACR_LOGIN_SERVER/$IMAGE_NAME:$GITHUB_SHA")
+          printf '%s\n' "$output"
+          test "$output" = "Hello, Gopher!"
+
+      - name: Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name "$ACR_NAME"
+
+      - name: Push image
+        run: |
+          docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:$GITHUB_SHA"

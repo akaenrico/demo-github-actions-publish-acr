@@ -1,0 +1,4 @@
+resource_group_name = "rg-acr-lab"
+location            = "eastus"
+acr_name            = "cracrlabga"
+acr_sku             = "Basic"
