@@ -11,4 +11,7 @@ The Action runs on every push made in any branches. It is composed by two differ
 
 I'm using Terraform mainly to create the Resource Group and the Container Registry (easier to remove all the created resources later on with `tf destroy`)
 
+Note to self: Everytime I use `tf destroy` I need to update the `AZURE_CLIENT_ID` secret
+
 Hire me pls, much love
+
